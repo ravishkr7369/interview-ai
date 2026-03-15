@@ -32,6 +32,8 @@ try {
       password,
     });
 
+    console.log(api)
+
     return response.data;
 } catch (error) {
    
