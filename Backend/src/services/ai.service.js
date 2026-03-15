@@ -152,7 +152,6 @@ export const generatePdfFromHtml = async (htmlContent) => {
 
   const pdfBuffer = await page.pdf({
     format: "A4",
-    printBackground: true,
     margin: {
       top: "15mm",
       bottom: "15mm",
@@ -198,10 +197,17 @@ export const generateResumePdf = async ({
   }
 
   Resume Requirements:
+  • Extract the candidate name from the resume text.
+  • If name is not clearly available, infer it from email or LinkedIn.
+• The candidate name must appear at the very top in large bold text.
 
   • The HTML should be a clean, professional resume layout suitable for PDF printing.
   • Use a single column layout.
   • Contact information must appear at the top.
+  • Pure white background
+• No watermark
+• No background colors
+• No borders around page
   • Use clear section headings such as:
 	- Summary
 	- Skills
