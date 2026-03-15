@@ -19,11 +19,16 @@ app.use(cors({
 
 
 
+app.get("/", (req, res) => {
+  res.status(200).send("Server is running");
+});
 
 /*   authRoutes  */
 app.use('/api/auth',authRoutes);
 
 
 app.use("/api/interview", interviewRoutes);
+
+
 
 export default app;
