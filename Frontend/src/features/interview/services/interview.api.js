@@ -7,6 +7,9 @@ const api = axios.create({
 
 
 
+
+
+
 /*
  Service to generate interview report based on user self description, resume and job description.
  */
@@ -17,16 +20,22 @@ export const generateInterviewReport = async ({
   resumeFile,
 }) => {
 
+
   const formData = new FormData();
   formData.append("jobDescription", jobDescription);
   formData.append("selfDescription", selfDescription);
   formData.append("resume", resumeFile);
+
 
   const response = await api.post("/api/interview/", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
+
+
+
+
 
   return response?.data;
 };
@@ -40,7 +49,7 @@ export const generateInterviewReport = async ({
 export const getInterviewReportById = async (interviewId) => {
   const response = await api.get(`/api/interview/report/${interviewId}`);
 
-  return response.data;
+  return response?.data;
 };
 
 /*
@@ -50,7 +59,7 @@ export const getInterviewReportById = async (interviewId) => {
 export const getAllInterviewReports = async () => {
   const response = await api.get("/api/interview");
 
-  return response.data;
+  return response?.data||[];
 };
 
 /*
@@ -66,7 +75,7 @@ export const generateResumePdf = async ({ interviewReportId }) => {
     },
   );
 
-  return response.data;
+  return response?.data||{};
 };
 
 
@@ -77,5 +86,5 @@ remove report by the user with the help of interviewId
 export const deleteReport=async(interviewId)=>{
   const response=await api.delete(`/api/interview/report/${interviewId}`)
 
-  return response.data;
+  return response?.data;
 }

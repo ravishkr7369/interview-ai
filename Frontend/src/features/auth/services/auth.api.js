@@ -33,7 +33,7 @@ try {
     });
 
 
-    console.log(response)
+    
 
     return response.data;
 } catch (error) {
@@ -59,7 +59,6 @@ export const logout = async () => {
 export const profile = async () => {
   try {
     const response = await api.get("/api/auth/profile");
-   
 
     return response.data;
   } catch (error) {

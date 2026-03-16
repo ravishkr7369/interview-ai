@@ -1,6 +1,8 @@
 import Groq from "groq-sdk";
 import { z } from "zod";
 import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -142,11 +144,20 @@ export const generateInterviewData = async ({
 };
 
 export const generatePdfFromHtml = async (htmlContent) => {
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+const isProduction = process.env.NODE_ENV === "production";
+
+const browser = isProduction
+  ? await puppeteerCore.launch({
+      args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    })
+  : await puppeteer.launch({
+      headless: "new",
+    });
+
   const page = await browser.newPage();
+
   await page.setContent(htmlContent, { waitUntil: "networkidle0" });
   await page.emulateMediaType("screen");
 

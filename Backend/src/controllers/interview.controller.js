@@ -4,7 +4,7 @@ import {
   generateResumePdf,
 } from "../services/ai.service.js";
 import Interview from "../models/interview.model.js";
-import { ConsoleMessage } from "puppeteer";
+
 const require = createRequire(import.meta.url);
 
 const pdfParse = require("pdf-parse");
@@ -17,6 +17,7 @@ export const generateInterviewReport = async (req, res) => {
     const resume = req.file;
 
     const { selfDescription="", jobDescription } = req.body;
+
 
     if (!resume) {
       return res.status(400).json({
@@ -39,6 +40,13 @@ export const generateInterviewReport = async (req, res) => {
          message: "Only PDF resumes are allowed",
        });
      } 
+
+     if (!resume.buffer) {
+       return res.status(400).json({
+         success: false,
+         message: "Invalid resume file",
+       });
+     }
     const resumeData = await pdfParse(resume.buffer);
 
     let resumeText = resumeData.text;
@@ -118,29 +126,39 @@ export const getAllInterviewReports = async (req, res) => {
  */
 export const generateResumeInPdf = async (req, res) => {
   const { interviewReportId } = req.params;
-  const interviewReport = await Interview.findById(interviewReportId);
 
-  if (!interviewReport) {
-    return res.status(404).json({
-      message: "Interview report not found.",
+  try {
+      const interviewReport = await Interview.findById(interviewReportId);
+
+      if (!interviewReport) {
+        return res.status(404).json({
+          message: "Interview report not found.",
+        });
+      }
+
+      const { resume, jobDescription, selfDescription } = interviewReport;
+
+      const pdfBuffer = await generateResumePdf({
+        resume,
+        jobDescription,
+        selfDescription,
+      });
+
+      // console.log(pdfBuffer)
+      res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`,
+      });
+
+      return res.send(pdfBuffer);
+  } catch (error) {
+    console.log(error?.message)
+    return res.status(500).json({
+      success: false,
+      message: "Failed to create interview report",
     });
   }
 
-  const { resume, jobDescription, selfDescription } = interviewReport;
-
-  const pdfBuffer = await generateResumePdf({
-    resume,
-    jobDescription,
-    selfDescription,
-  });
-
-  // console.log(pdfBuffer)
-  res.set({
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`,
-  });
-
-  return res.send(pdfBuffer);
 };
 
 export const deleteReport = async (req, res) => {

@@ -43,12 +43,15 @@ export const register = async (req, res) => {
       { expiresIn: "1d" },
     );
 
+
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "None",
+    secure: isProduction,
+    sameSite: isProduction ? "None" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
-    path: "/",
+    path:"/"
   });
 
     return res.status(201).json({
@@ -101,15 +104,17 @@ export const login = async (req, res) => {
       { expiresIn: "1d" },
     );
 
-    res.cookie("token", token, {
+  
+
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "None",
+    secure: isProduction,
+    sameSite: isProduction ? "None" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
-    path: "/",
+    path:"/"
   });
-
-
   
     return res.status(200).json({
       message: "Login successful",
